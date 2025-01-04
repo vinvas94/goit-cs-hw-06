@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  http_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.http
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - mongodb
+
+  websocket_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.websocket
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - ./storage/data.json:/app/storage/data.json
+    depends_on:
+      - mongodb
+    command: python3 socket_server.py
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
